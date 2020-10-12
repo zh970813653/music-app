@@ -10,6 +10,7 @@
   "dependencies": {
     "axios": "^0.20.0",
     "better-scroll": "^1.15.1",
+    "body-parser": "^1.19.0",
     "core-js": "^3.6.5",
     "jsonp": "^0.2.1",
     "vue": "^2.6.11",

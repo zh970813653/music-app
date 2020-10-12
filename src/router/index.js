@@ -28,7 +28,13 @@ const routes = [
   {
     path: '/singer',
     name: 'Singer',
-    component: () => import(/* webpackChunkName: "about" */ '../components/singer/singer.vue')
+    component: () => import(/* webpackChunkName: "about" */ '../components/singer/singer.vue'),
+    children: [
+      {
+        path: ':id',
+        component: () => import(/* webpackChunkName: "about" */ '../components/singer-detail/singer-detail.vue')
+      }
+    ]
   }
 ]
 

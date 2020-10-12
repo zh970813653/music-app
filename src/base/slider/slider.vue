@@ -87,7 +87,6 @@ export default {
       })
       this.slider.on('scrollEnd', () => {
         const pageIndex = this.slider.getCurrentPage().pageX
-        console.log(pageIndex)
         this.currentIndex = pageIndex
         if (this.autoPlay) {
           this._play()
