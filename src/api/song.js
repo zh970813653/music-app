@@ -26,10 +26,8 @@ export function getLyric (mid) {
 
 export function getSongsUrl (songs) {
   const url = debug ? '/api/getPurlUrl' : 'http://ustbhuangyi.com/music/api/getPurlUrl'
-
   const mids = []
   const types = []
-
   songs.forEach((song) => {
     mids.push(song.mid)
     types.push(0)

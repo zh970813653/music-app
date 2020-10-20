@@ -25,7 +25,7 @@ export default class Song {
       getLyric(this.mid).then((res) => {
         if (res.retcode === ERR_OK) {
           this.lyric = Base64.decode(res.lyric)
-          console.log(this.lyric)
+          // console.log(this.lyric)
           resolve(this.lyric)
         } else {
           reject(new Error('no lyric'))
@@ -64,10 +64,12 @@ export function isValidMusic (musicData) {
 }
 
 export function processSongsUrl (songs) {
+  console.log(songs)
   if (!songs.length) {
     return Promise.resolve(songs)
   }
   return getSongsUrl(songs).then((purlMap) => {
+    console.log(purlMap)
     songs = songs.filter((song) => {
       const purl = purlMap[song.mid]
       if (purl) {

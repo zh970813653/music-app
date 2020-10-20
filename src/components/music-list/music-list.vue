@@ -26,7 +26,7 @@
     ref="list"
     >
       <div class="song-list-wrapper">
-        <song-list @selectItem="selectItem" :songs="songs"></song-list>
+        <song-list :rank="rank" @selectItem="selectItem" :songs="songs"></song-list>
       </div>
       <div v-show="!songs.length" class="loading-container">
         <loading></loading>
@@ -40,7 +40,7 @@ import Scroll from 'base/scroll/scroll'
 import Loading from 'base/loading/loading'
 import SongList from 'base/song-list/song-list'
 import { prefixStyle } from 'utils/dom'
-// import { playlistMixin } from 'common/js/mixin'
+import { playlistMixin } from 'common/mixin'
 import { mapActions } from 'vuex'
 
 const RESERVED_HEIGHT = 40
@@ -48,7 +48,7 @@ const transform = prefixStyle('transform')
 // const backdrop = prefixStyle('backdrop-filter')
 
 export default {
-  // mixins: [playlistMixin],
+  mixins: [playlistMixin],
   props: {
     bgImage: {
       type: String,
@@ -84,6 +84,11 @@ export default {
       'selectPlay',
       'randomPlay'
     ]),
+    handlePlaylist (playlist) {
+      const bottom = playlist.length > 0 ? 60 : ''
+      this.$refs.list.$el.style.bottom = bottom + 'px'
+      this.$refs.list.refresh()
+    },
     random () {
       this.randomPlay({
         list: this.songs
@@ -140,8 +145,6 @@ export default {
     this.imageHeight = this.$refs.bgImage.clientHeight
     this.minTranslateY = -this.imageHeight + RESERVED_HEIGHT
     this.$refs.list.$el.style.top = this.$refs.bgImage.clientHeight + 'px'
-
-    // console.log(this.$refs.list.styles)
   }
 }
 </script>

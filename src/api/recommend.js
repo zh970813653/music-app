@@ -67,10 +67,23 @@ export function getDiscList () {
     return Promise.resolve(res.data)
   })
 }
-// import { commonParams, options } from './config'
-// import {http} from '../utils/http'
+export function getSongList (disstid) {
+  const url = debug ? '/api/getCdInfo' : 'http://ustbhuangyi.com/music/api/getCdInfo'
 
-// export function getRecommendList () {
-//   const url = 'https://c.y.qq.com/musichall/fcgi-bin/fcg_yqqhomepagerecommend.fcg'
-//   const data = Object.assign({}, commonParams)
-// }
+  const data = Object.assign({}, commonParams, {
+    disstid,
+    type: 1,
+    json: 1,
+    utf8: 1,
+    onlysong: 0,
+    platform: 'yqq',
+    hostUin: 0,
+    needNewCode: 0
+  })
+
+  return axios.get(url, {
+    params: data
+  }).then((res) => {
+    return Promise.resolve(res.data)
+  })
+}

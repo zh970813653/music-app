@@ -1,7 +1,7 @@
 <template>
-  <div class="singer-cotainer">
+  <div class="singer-cotainer" ref="singer">
     <!-- 这是singer -->
-    <listview @selectItem="selectItem" :data="singers"></listview>
+    <listview @selectItem="selectItem" :data="singers" ref="listview"></listview>
     <transition>
       <router-view></router-view>
     </transition>
@@ -12,11 +12,14 @@
 import { getSingerList, ERR_OK } from 'api/singer'
 import { mapMutations } from 'vuex'
 import listview from 'base/listview/listview'
+import { playlistMixin } from 'common/mixin'
+
 import Singer from 'common/singer'
 // const
 const HOT_NAME = '热门'
 const HOT_SINGER_LEN = 10
 export default {
+  mixins: [playlistMixin],
   components: {
     listview
   },
@@ -37,6 +40,11 @@ export default {
         console.log(this.singers)
         // this._nomalizeSinger(this.singers)
       }
+    },
+    handlePlaylist (playlist) {
+      const bottom = playlist.length > 0 ? 60 : ''
+      this.$refs.singer.style.bottom = bottom + 'px'
+      this.$refs.listview.refresh()
     },
     selectItem (singer) {
       this.setSinger(singer)

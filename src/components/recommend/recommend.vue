@@ -12,9 +12,9 @@
       </div>
       <div class="recommend-list">
         <h1 class="list-title">热门歌单推荐</h1>
-        <scroll class="scroll-wrapper">
+        <scroll class="scroll-wrapper" ref="recommendWrapper">
         <ul class="recommend-list-container">
-          <li class="recommend-list-container-item" v-for="(item,index) in discList" :key="index">
+          <li @click="selectItem(item)" class="recommend-list-container-item" v-for="(item,index) in discList" :key="index">
             <div class="item-left">
               <img v-lazy="item.imgurl" alt="">
             </div>
@@ -26,6 +26,7 @@
         </ul>
         <v-loading v-show="!discList.length" class="recommend-loading"></v-loading>
         </scroll>
+        <router-view></router-view>
       </div>
     </div>
   </div>
@@ -33,10 +34,14 @@
 
 <script>
 import { getRecommend, getDiscList, ERR_OK } from 'api/recommend'
+import { mapMutations } from 'vuex'
 import Slider from 'base/slider/slider'
 import Scroll from 'base/scroll/scroll'
 import VLoading from 'base/loading/loading'
+import { playlistMixin } from 'common/mixin'
+
 export default {
+  mixins: [playlistMixin],
   components: {
     Slider,
     Scroll,
@@ -49,9 +54,14 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(
+      {
+        setDesc: 'SET_DISC'
+      }
+    ),
     async _getRecommend () {
       const res = await getRecommend()
-      // console.log(res)
+      console.log(res)
       if (res && res.code === ERR_OK) {
         this.recommends = res.data.slider
       }
@@ -62,6 +72,17 @@ export default {
       if (res && res.code === ERR_OK) {
         this.discList = res.data.list
       }
+    },
+    selectItem (item) {
+      this.setDesc(item)
+      this.$router.push({
+        path: `/recommend/${item.dissid}`
+      })
+    },
+    handlePlaylist (playlist) {
+      const bottom = playlist.length > 0 ? 60 : ''
+      this.$refs.recommendWrapper.$el.style.bottom = bottom + 'px'
+      this.$refs.recommendWrapper.refresh()
     }
   },
   mounted () {
