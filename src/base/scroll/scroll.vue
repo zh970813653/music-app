@@ -28,10 +28,12 @@ export default {
       type: Array,
       default: null
     },
+    // 是否开启上拉刷新
     pullup: {
       type: Boolean,
       default: false
     },
+    // 滚动开始前触发事件
     beforeScroll: {
       type: Boolean,
       default: false
@@ -71,10 +73,11 @@ export default {
           this.$emit('scroll', pos)
         })
       }
-
+      // 如果开始了上拉刷新
       if (this.pullup) {
         this.scroll.on('scrollEnd', () => {
           if (this.scroll.y <= (this.scroll.maxScrollY + 50)) {
+            console.log(this.scroll.y, this.scroll.maxScrollY)
             this.$emit('scrollToEnd')
           }
         })

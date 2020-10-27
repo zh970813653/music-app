@@ -47,7 +47,6 @@ export function createSong (musicData) {
     url: musicData.url
   })
 }
-
 function filterSinger (singer) {
   const ret = []
   if (!singer) {
@@ -69,7 +68,6 @@ export function processSongsUrl (songs) {
     return Promise.resolve(songs)
   }
   return getSongsUrl(songs).then((purlMap) => {
-    console.log(purlMap)
     songs = songs.filter((song) => {
       const purl = purlMap[song.mid]
       if (purl) {
