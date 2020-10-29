@@ -115,32 +115,36 @@
           <i @click.stop="togglePlaying" class="icon-mini" :class="miniIcon"></i>
           </progress-circle>
         </div>
-        <div class="control">
+        <div class="control" @click.stop="showPlayList">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
+    <play-list ref="playList"></play-list>
     <audio ref="audio" @ended="end" @playing="ready" @error="error" @timeupdate="updateTime"></audio>
   </div>
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters } from 'vuex'
 import animations from 'create-keyframe-animation'
 import progressBar from 'base/progress-bar/progress-bar'
 import progressCircle from 'base/progress-circle/progress-circle'
 import Scroll from 'base/scroll/scroll'
-import { shuffle } from 'utils/shuffle'
+import PlayList from 'components/playlist/playlist'
 import { playMode } from 'common/config'
 import { prefixStyle } from 'utils/dom'
+import { playerMixin } from 'common/mixin'
 import Lyric from 'lyric-parser'
 const transform = prefixStyle('transform')
 const transitionDuration = prefixStyle('transitionDuration')
 export default {
+  mixins: [playerMixin],
   components: {
     progressBar,
     progressCircle,
-    Scroll
+    Scroll,
+    PlayList
   },
   data () {
     return {
@@ -159,12 +163,7 @@ export default {
   computed: {
     ...mapGetters([
       'fullScreen',
-      'playlist',
-      'currentSong',
-      'playing',
-      'currentIndex',
-      'sequenceList',
-      'mode'
+      'playing'
     ]),
     playIcon () {
       return this.playing ? 'icon-pause' : 'icon-play'
@@ -180,19 +179,9 @@ export default {
     },
     percent () {
       return this.currentTime / this.currentSong.duration
-    },
-    iconMode () {
-      return this.mode === playMode.sequence ? 'icon-sequence' : this.mode === playMode.loop ? 'icon-loop' : 'icon-random'
     }
   },
   methods: {
-    ...mapMutations({
-      setFullScreen: 'SET_FULL_SCREEN',
-      setPlaying: 'SET_PLAYING_STATE',
-      setCurrentIndex: 'SET_CURRENT_INDEX',
-      setPlayMode: 'SET_PLAY_MODE',
-      setPlayList: 'SET_PLAYLIST'
-    }),
     middleTouchStart (e) {
       this.touch.initiated = true
       const touch = e.touches[0]
@@ -267,6 +256,9 @@ export default {
         this.currentLyric.seek(0)
       }
     },
+    showPlayList () {
+      this.$refs.playList.show()
+    },
     ready () {
       this.songReady = true
     },
@@ -286,27 +278,13 @@ export default {
       // console.log(second)
       return `${minute}:${second}`
     },
-    changeMode () {
-      // this.list = null
 
-      const mode = (this.mode + 1) % 3
-      this.setPlayMode(mode)
-
-      let list = null
-      if (mode === playMode.random) {
-        list = shuffle(this.sequenceList)
-      } else {
-        list = this.sequenceList
-      }
-      this.resetCurrentIndex(list)
-      this.setPlayList(list)
-    },
-    resetCurrentIndex (list) {
-      const index = list.findIndex(item => {
-        return item.id === this.currentSong.id
-      })
-      this.setCurrentIndex(index)
-    },
+    // resetCurrentIndex (list) {
+    //   const index = list.findIndex(item => {
+    //     return item.id === this.currentSong.id
+    //   })
+    //   this.setCurrentIndex(index)
+    // },
     onProgressBarChange (percent) {
       this.$refs.audio.currentTime = this.currentSong.duration * percent
       if (!this.playing) {
@@ -406,7 +384,7 @@ export default {
         if (this.playing) {
           this.currentLyric.play()
         }
-        console.log(this.currentLyric)
+        // console.log(this.currentLyric)
       } catch (e) {
         this.currentLyric = null
         this.playingLyric = ''
@@ -451,15 +429,11 @@ export default {
       this.setFullScreen(true)
     }
   },
-  mounted () {
-    const a = true
-    // console.log(this.currentSong)
-    console.log(a.valueOf())
-  },
   watch: {
     currentSong (newVal, oldVal) {
-      console.log(newVal)
-      // this.$nextTick(() => {
+      if (!newVal.id) {
+        return
+      }
       if (newVal.id === oldVal.id) {
         return
       }
@@ -498,7 +472,7 @@ export default {
     right: 0;
     top: 0;
     bottom: 0;
-    z-index: 150;
+    z-index: 999;
     background: $color-background;
 
     .background {
@@ -768,7 +742,7 @@ export default {
     position: fixed;
     left: 0;
     bottom: 0;
-    z-index: 180;
+    z-index: 999;
     width: 100%;
     height: 60px;
     background: $color-highlight-background;
