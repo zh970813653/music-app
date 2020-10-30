@@ -24,9 +24,6 @@ export default {
   },
   created () {
     this.$watch('query', newQuery => {
-      // if (!newQuery || !newQuery.trim()) {
-      //   return
-      // }
       if (this.timeId) {
         clearTimeout(this.timeId)
       }

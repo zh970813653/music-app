@@ -22,7 +22,7 @@
           <div class="search-history" v-show="searchHistory.length">
             <h1 class="title">
               <span class="text">搜索历史</span>
-              <span class="clear" @click="clear">
+              <span class="clear" @click="clearSearch">
                 <i class="icon-clear"></i>
               </span>
             </h1>
@@ -58,11 +58,11 @@ import Suggest from 'components/suggest/suggest'
 import SearchList from 'base/search-list/search-list'
 import Confirm from 'base/confirm/confirm'
 import Scroll from 'base/scroll/scroll'
-import { playlistMixin } from 'common/mixin'
+import { playlistMixin, searchMixin } from 'common/mixin'
 import { getHotKey, ERR_OK } from 'api/search'
 import { mapActions, mapGetters } from 'vuex'
 export default {
-  mixins: [playlistMixin],
+  mixins: [playlistMixin, searchMixin],
   components: {
     SearchBox,
     Suggest,
@@ -72,7 +72,6 @@ export default {
   },
   data () {
     return {
-      query: '',
       hotKey: []
     }
   },
@@ -98,24 +97,12 @@ export default {
         this.hotKey = res.data.hotkey.slice(0, 10)
       }
     },
-    addQuery (k) {
-      this.$refs.searchBox.setQuery(k)
-    },
-    onQueryChange (query) {
-      this.query = query
-    },
     handlePlaylist (playlist) {
       const bottom = playlist.length > 0 ? 60 : ''
       this.$refs.shortcutWrapper.style.bottom = bottom + 'px'
       this.$refs.shortcut.refresh()
       this.$refs.searchResult.style.bottom = bottom + 'px'
       this.$refs.suggest.refresh()
-    },
-    clear () {
-      this.$refs.confirm.show()
-    },
-    blurInput () {
-      this.$refs.searchBox.blur()
     }
   },
   watch: {
