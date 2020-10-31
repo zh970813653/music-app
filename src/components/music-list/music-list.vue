@@ -42,7 +42,6 @@ import SongList from 'base/song-list/song-list'
 import { prefixStyle } from 'utils/dom'
 import { playlistMixin } from 'common/mixin'
 import { mapActions } from 'vuex'
-
 const RESERVED_HEIGHT = 40
 const transform = prefixStyle('transform')
 // const backdrop = prefixStyle('backdrop-filter')

@@ -126,7 +126,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import animations from 'create-keyframe-animation'
 import progressBar from 'base/progress-bar/progress-bar'
 import progressCircle from 'base/progress-circle/progress-circle'
@@ -182,6 +182,9 @@ export default {
     }
   },
   methods: {
+    ...mapActions([
+      'savePlayHistory'
+    ]),
     middleTouchStart (e) {
       this.touch.initiated = true
       const touch = e.touches[0]
@@ -261,6 +264,7 @@ export default {
     },
     ready () {
       this.songReady = true
+      this.savePlayHistory(this.currentSong)
     },
     error () {
       this.songReady = true
@@ -302,23 +306,23 @@ export default {
       }
     },
     next () {
+      let index
       if (!this.songReady) {
         return
       }
       if (this.playlist.length === 1) {
         this.loop()
       } else {
-        let index = this.currentIndex + 1
+        index = this.currentIndex + 1
         if (index === this.playlist.length) {
           index = 0
         }
+        console.log(this.currentIndex)
         this.setCurrentIndex(index)
         if (!this.playing) {
           this.togglePlaying()
         }
       }
-
-      this.songReady = false
     },
     prev () {
       if (!this.songReady) {

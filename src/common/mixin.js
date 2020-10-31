@@ -34,6 +34,7 @@ export const playerMixin = {
         'sequenceList',
         'currentSong',
         'playlist',
+        'currentIndex',
         'mode'
       ]
     ),
@@ -75,7 +76,8 @@ export const playerMixin = {
 export const searchMixin = {
   data () {
     return {
-      query: ''
+      query: '',
+      refreshDelay: 120
     }
   },
   computed: {
@@ -89,9 +91,9 @@ export const searchMixin = {
     blurInput () {
       this.$refs.searchBox.blur()
     },
-    // saveSearch () {
-    //   this.saveSearchHistory(this.query)
-    // },
+    saveSearch () {
+      this.saveSearchHistory(this.query)
+    },
     onQueryChange (query) {
       this.query = query
     },
