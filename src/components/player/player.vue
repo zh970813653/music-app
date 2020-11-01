@@ -18,12 +18,12 @@
           <h1 class="title" v-html="currentSong.name"></h1>
           <h2 class="subtitle"></h2>
         </div>
-        <div class="middle"
-        @touchstart.prevent="middleTouchStart"
-        @touchmove.prevent="middleTouchMove"
-        @touchend="middleTouchEnd"
+        <div
+          class="middle"
+          @touchstart.prevent="middleTouchStart"
+          @touchmove.prevent="middleTouchMove"
+          @touchend="middleTouchEnd"
         >
-
           <div class="middle-l" ref="middleL">
             <div class="cd-wrapper" ref="cdWrapper">
               <div class="cd" ref="imageWrapper">
@@ -36,41 +36,46 @@
               </div>
             </div>
             <div class="playing-lyric-wrapper">
-              <div class="playing-lyric">{{playingLyric}}</div>
+              <div class="playing-lyric">{{ playingLyric }}</div>
             </div>
           </div>
           <scroll class="middle-r" ref="lyricList">
-          <div class="lyric-wrapper">
-            <div v-if="currentLyric">
-              <p
-                ref="lyricLine"
-                class="text"
-                :class="{'current':currentLineNum===index}"
-                v-for="(line,index) in currentLyric.lines"
-                :key="index"
-              >{{line.txt}}</p>
-            </div>
-            <!-- <div class="pure-music" v-show="isPureMusic">
+            <div class="lyric-wrapper">
+              <div v-if="currentLyric">
+                <p
+                  ref="lyricLine"
+                  class="text"
+                  :class="{ current: currentLineNum === index }"
+                  v-for="(line, index) in currentLyric.lines"
+                  :key="index"
+                >
+                  {{ line.txt }}
+                </p>
+              </div>
+              <!-- <div class="pure-music" v-show="isPureMusic">
               <p>{{pureMusicLyric}}</p>
             </div> -->
-          </div>
+            </div>
           </scroll>
         </div>
         <div class="bottom">
-           <div class="dot-wrapper">
-          <span class="dot" :class="{'active':currentShow==='cd'}"></span>
-          <span class="dot" :class="{'active':currentShow==='lyric'}"></span>
-        </div>
-        <div class="progress-wrapper">
-          <span class="time time-l">{{format(currentTime)}}</span>
-          <div class="progress-bar-wrapper">
-            <progress-bar
-              ref="progressBar"
-              :percent="percent"
-              @percentChange="onProgressBarChange"
-            ></progress-bar>
+          <div class="dot-wrapper">
+            <span class="dot" :class="{ active: currentShow === 'cd' }"></span>
+            <span
+              class="dot"
+              :class="{ active: currentShow === 'lyric' }"
+            ></span>
           </div>
-          <span class="time time-r">{{format(currentSong.duration)}}</span>
+          <div class="progress-wrapper">
+            <span class="time time-l">{{ format(currentTime) }}</span>
+            <div class="progress-bar-wrapper">
+              <progress-bar
+                ref="progressBar"
+                :percent="percent"
+                @percentChange="onProgressBarChange"
+              ></progress-bar>
+            </div>
+            <span class="time time-r">{{ format(currentSong.duration) }}</span>
           </div>
           <div class="operators">
             <div class="icon i-left" @click="changeMode">
@@ -86,7 +91,11 @@
               <i class="icon-next"></i>
             </div>
             <div class="icon i-right" :class="disableCls">
-              <i class="icon icon-not-favorite"></i>
+              <i
+                class="icon"
+                @click="toggleFavorite(currentSong)"
+                :class="getFavoriteIcon(currentSong)"
+              ></i>
             </div>
           </div>
         </div>
@@ -112,7 +121,11 @@
         </div>
         <div class="control">
           <progress-circle :radius="radius" :percent="percent">
-          <i @click.stop="togglePlaying" class="icon-mini" :class="miniIcon"></i>
+            <i
+              @click.stop="togglePlaying"
+              class="icon-mini"
+              :class="miniIcon"
+            ></i>
           </progress-circle>
         </div>
         <div class="control" @click.stop="showPlayList">
@@ -121,7 +134,13 @@
       </div>
     </transition>
     <play-list ref="playList"></play-list>
-    <audio ref="audio" @ended="end" @playing="ready" @error="error" @timeupdate="updateTime"></audio>
+    <audio
+      ref="audio"
+      @ended="end"
+      @playing="ready"
+      @error="error"
+      @timeupdate="updateTime"
+    ></audio>
   </div>
 </template>
 
@@ -279,16 +298,8 @@ export default {
       interval = interval | 0
       const minute = interval / 60 | 0
       const second = (interval % 60).toString().padStart(2, 0)
-      // console.log(second)
       return `${minute}:${second}`
     },
-
-    // resetCurrentIndex (list) {
-    //   const index = list.findIndex(item => {
-    //     return item.id === this.currentSong.id
-    //   })
-    //   this.setCurrentIndex(index)
-    // },
     onProgressBarChange (percent) {
       this.$refs.audio.currentTime = this.currentSong.duration * percent
       if (!this.playing) {
@@ -307,11 +318,10 @@ export default {
     },
     next () {
       let index
-      if (!this.songReady) {
-        return
-      }
+      if (!this.songReady) return
       if (this.playlist.length === 1) {
         this.loop()
+        this.setPlaying(true)
       } else {
         index = this.currentIndex + 1
         if (index === this.playlist.length) {
@@ -327,6 +337,13 @@ export default {
     prev () {
       if (!this.songReady) {
         return
+      }
+      if (this.playlist.length === 1) {
+        this.loop()
+        this.setPlaying(true)
+        return
+        // this.togglePlaying()
+        // return
       }
       let index = this.currentIndex - 1
       if (index === -1) {
@@ -384,6 +401,9 @@ export default {
     async getLyric () {
       try {
         const lyric = await this.currentSong.getLyric()
+        if (this.currentSong.lyric !== lyric) {
+          return
+        }
         this.currentLyric = new Lyric(lyric, this.handleLyric)
         if (this.playing) {
           this.currentLyric.play()
@@ -435,22 +455,28 @@ export default {
   },
   watch: {
     currentSong (newVal, oldVal) {
-      if (!newVal.id) {
+      if (!newVal.id || !newVal.url || newVal.id === oldVal.id) {
         return
       }
-      if (newVal.id === oldVal.id) {
-        return
-      }
+      this.songReady = false
+      this.canLyricPlay = false
       if (this.currentLyric) {
         this.currentLyric.stop()
+        // 重置为null
+        this.currentLyric = null
+        this.currentTime = 0
+        this.playingLyric = ''
+        this.currentLineNum = 0
       }
       this.$refs.audio.src = newVal.url
-      if (this.$refs.audio.play() !== undefined) {
-        this.$refs.audio.play().then(() => {
-          this.$refs.audio.play()
-          this.getLyric()
-        })
-      }
+      // this.$refs.audio.src = newSong.url
+      this.$refs.audio.play()
+      // 若歌曲 5s 未播放，则认为超时，修改状态确保可以切换歌曲。
+      clearTimeout(this.timer)
+      this.timer = setTimeout(() => {
+        this.songReady = true
+      }, 5000)
+      this.getLyric()
     },
     playing (newV) {
       const audio = this.$refs.audio

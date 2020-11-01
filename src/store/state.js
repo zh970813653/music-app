@@ -1,5 +1,5 @@
 import { playMode } from 'common/config'
-import { loadSearch, loadPlay } from 'common/cache'
+import { loadSearch, loadPlay, loadFavorite } from 'common/cache'
 const state = {
   singer: {},
   playing: false, // 播放的状态
@@ -11,7 +11,8 @@ const state = {
   disc: {},
   topList: {},
   searchHistory: loadSearch(), // 搜索历史
-  playHistory: loadPlay() // 播放历史
+  playHistory: loadPlay(), // 播放历史
+  favoriteList: loadFavorite() // 收藏数据
 
 }
 

@@ -35,7 +35,8 @@ export const playerMixin = {
         'currentSong',
         'playlist',
         'currentIndex',
-        'mode'
+        'mode',
+        'favoriteList'
       ]
     ),
     iconMode () {
@@ -51,6 +52,28 @@ export const playerMixin = {
       setPlayList: 'SET_PLAYLIST',
       setPlayState: 'SET_PLAYING_STATE'
     }),
+    ...mapActions([
+      'saveFavoriteList',
+      'deleteFavorList'
+    ]),
+    toggleFavorite (song) {
+      // 判断当前是否是收藏状态
+      if (this.isFavorite(song)) {
+        this.deleteFavorList(song)
+      } else {
+        this.saveFavoriteList(song)
+      }
+    },
+    getFavoriteIcon (song) {
+      if (this.isFavorite(song)) {
+        return 'icon-favorite'
+      }
+      return 'icon-not-favorite'
+    },
+    isFavorite (song) {
+      const index = this.favoriteList.findIndex(item => item.id === song.id)
+      return index > -1
+    },
     resetCurrentIndex (list) {
       const index = list.findIndex(item => {
         return item.id === this.currentSong.id
